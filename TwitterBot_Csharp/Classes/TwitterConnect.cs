@@ -1,12 +1,14 @@
-﻿using System;
+﻿using HtmlAgilityPack;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TweetSharp;
 using System.Drawing;
 using System.IO;
+using System.Linq;
+using System.Net;
+using System.Text;
+using System.Threading.Tasks;
 using System.Drawing.Imaging;
+using TweetSharp;
 
 namespace TwitterBot_Csharp.Classes
 {
@@ -20,9 +22,45 @@ namespace TwitterBot_Csharp.Classes
             return stream;
         }
 
-        public static Image PoetryFoundationToImage()
+        public static HtmlAgilityPack.HtmlDocument LinkToHtmlDoc(string url)
+        {
+            WebClient client = new WebClient();
+            client.Encoding = Encoding.UTF8; // to deal w/ odd chars
+            string htmlString = client.DownloadString(url);
+            var doc = new HtmlAgilityPack.HtmlDocument();
+            doc.LoadHtml(htmlString);
+            return doc;
+        }
+
+        public static Image PoetryFoundationRndmToImage()
         {
 
+            Random rnd = new Random();
+            int poemInt = rnd.Next(50100, 58800);
+
+            string url = "https://www.poetryfoundation.org/poems-and-poets/poems/detail/" + poemInt.ToString(); //90621
+
+            WebClient client = new WebClient();
+            client.Encoding = Encoding.UTF8; // to deal w/ odd chars
+            string htmlString = client.DownloadString(url);
+
+            var doc = new HtmlAgilityPack.HtmlDocument();
+            doc.LoadHtml(htmlString);
+
+            HtmlNode poemDiv = doc.DocumentNode.SelectSingleNode("//div[@class='poem']");
+            HtmlNode titleSpan = doc.DocumentNode.SelectSingleNode("//span[@class='hdg hdg_1']");
+            HtmlNode authSpan = doc.DocumentNode.SelectSingleNode("//span[@class='hdg hdg_utility']");
+
+            string htmlConcat =
+
+                    @"<div style=""text-indent: -1em; padding-left: 1em;""> <b>" + titleSpan.InnerText.ToString().ToUpper() + @"</b>"
+                + authSpan.InnerText.ToString().ToUpper() + @"</div><br>"
+                + poemDiv.OuterHtml.ToString();
+
+
+            Image image = TheArtOfDev.HtmlRenderer.WinForms.HtmlRender.RenderToImage(htmlConcat);
+
+            return image;
 
         }
 
@@ -52,6 +90,26 @@ namespace TwitterBot_Csharp.Classes
 
         }
 
+        public static void FollowPoetryHashtaggers(int cnt)
+        {
+
+            string _consumerKey = "licUTuwmj4J16pMy30UFQZofI";
+            string _consumerSecret = "LuLn34qrT7iczsga7RvtJnHf1jncDH4oJU70Btzj9LTz8rjA5E";
+            string _accessToken = "801871349434187776-mcvC35KftjhlR7doV6l6UQzrAWIFbdz";
+            string _accessTokenSecret = "AWClOy005tBXiyxnFUlLVAuDhu269YI5vyh5HSW1mUA2D";
+
+            var service = new TwitterService(_consumerKey, _consumerSecret);
+            service.AuthenticateWith(_accessToken, _accessTokenSecret);
+
+            var tweets = service.Search(new SearchOptions { Q = "#poetry", Count = cnt, Resulttype = TwitterSearchResultType.Popular, IncludeEntities = false });
+
+            foreach (var tweet in tweets.Statuses)
+            {
+//                Console.WriteLine(tweet.User.ScreenName);
+                service.FollowUser(new FollowUserOptions { UserId = tweet.User.Id } );
+            }
+
+        }
 
     }
 }

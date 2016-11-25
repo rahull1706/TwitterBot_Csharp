@@ -21,39 +21,59 @@ namespace TwitterBot_Csharp
         static void Main(string[] args)
         {
 
+            //create a config file for your creds so you can publish to GitHub
+
+            //get random page
             Random rnd = new Random();
-            int poemInt = rnd.Next(50100, 58800);
+            int page = rnd.Next(1, 500);
+            string url = "http://www.public-domain-poetry.com/listpoetry.php?letter=All&page=" + page.ToString();
+
+            var doc = TwitterConnect.LinkToHtmlDoc(url);
+
+            HtmlNodeCollection poemLinks = doc.DocumentNode.SelectNodes("//a"); // get all links
+            List<string> strPoems = new List<string>();
+
+            foreach (var link in poemLinks)
+            {
+                var href = link.Attributes["href"].Value;
+                if (href.ToString().Contains("php") == false
+                    && href.ToString().Contains("http") == false
+                    && href.ToString().Substring(href.Length - 1) != @"/"
+                    && href.ToString().Any(char.IsDigit))
+                {
+                    strPoems.Add(href); // put just links in list
+                }          
+            }
 
 
-            string url = "https://www.poetryfoundation.org/poems-and-poets/poems/detail/" + poemInt.ToString(); //90621
+            int rndPoem = rnd.Next(1, strPoems.Count);
 
-            WebClient client = new WebClient();
-            client.Encoding = Encoding.UTF8; // to deal w/ odd chars
-            string htmlString = client.DownloadString(url);
+            Console.WriteLine("http://www.public-domain-poetry.com/" + strPoems[rndPoem]);
 
-            var doc = new HtmlAgilityPack.HtmlDocument();
-            doc.LoadHtml(htmlString);
+            /*            foreach (var str in strPoems)
+            {
+                Console.WriteLine(str);
+            }*/
 
-            HtmlNode poemDiv = doc.DocumentNode.SelectSingleNode("//div[@class='poem']");
-            HtmlNode titleSpan = doc.DocumentNode.SelectSingleNode("//span[@class='hdg hdg_1']");
-            HtmlNode authSpan = doc.DocumentNode.SelectSingleNode("//span[@class='hdg hdg_utility']");
-
-            string htmlConcat =
-
-                 @"<div style=""text-indent: -1em; padding-left: 1em;""> <b>" + titleSpan.InnerText.ToString().ToUpper() + @"</b>"
-                + authSpan.InnerText.ToString().ToUpper() + @"</div><br>"
-                + poemDiv.OuterHtml.ToString();
+            Console.ReadKey();
 
 
-            Image image = TheArtOfDev.HtmlRenderer.WinForms.HtmlRender.RenderToImage(htmlConcat);
+            
 
-            image.Save(@"C:\Users\kirkbozeman\Desktop\test.png");
-            System.IO.File.WriteAllText(@"C:\Users\kirkbozeman\Desktop\Poem.txt", htmlConcat);
+            /*
 
-
-            TwitterConnect.PostToBot("", image.ToStream(ImageFormat.Png));
-
-            //  Console.ReadKey();
+            try
+            {
+                Image image = TwitterConnect.PoetryFoundationRndmToImage();
+                TwitterConnect.PostToBot("", image.ToStream(ImageFormat.Png));
+                TwitterConnect.FollowPoetryHashtaggers(5);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Console.ReadKey();
+            }
+            */
         }
     }
 }
