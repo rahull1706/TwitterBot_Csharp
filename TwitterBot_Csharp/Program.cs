@@ -18,7 +18,7 @@ namespace TwitterBot_Csharp
                 Random rnd = new Random();
                 int rndMethod = rnd.Next(1, 2);
 
-//                rndMethod = 2;
+//                rndMethod = 3;
 
                 Image image;
 
@@ -33,14 +33,15 @@ namespace TwitterBot_Csharp
                     TwitterConnect.PostToBot("", image.ToStream(ImageFormat.Png));
                 }
 
-                TwitterConnect.FollowPoetryHashtaggers(1);
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
                 Console.ReadKey();
             }
-            
+
+            TwitterConnect.FollowPoetryHashtaggers(1);
+
         }
     }
 }

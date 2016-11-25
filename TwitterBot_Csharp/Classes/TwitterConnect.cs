@@ -1,6 +1,8 @@
 ﻿using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Configuration;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -117,10 +119,16 @@ namespace TwitterBot_Csharp.Classes
             to reinstall the entire package. It must be installed ON TOP of existing final TweetSharp package.
              */
 
-            string _consumerKey = "licUTuwmj4J16pMy30UFQZofI";
+/*            string _consumerKey = "licUTuwmj4J16pMy30UFQZofI";
             string _consumerSecret = "LuLn34qrT7iczsga7RvtJnHf1jncDH4oJU70Btzj9LTz8rjA5E";
             string _accessToken = "801871349434187776-mcvC35KftjhlR7doV6l6UQzrAWIFbdz";
-            string _accessTokenSecret = "AWClOy005tBXiyxnFUlLVAuDhu269YI5vyh5HSW1mUA2D";
+            string _accessTokenSecret = "AWClOy005tBXiyxnFUlLVAuDhu269YI5vyh5HSW1mUA2D";*/
+
+            string _consumerKey = ConfigurationManager.AppSettings["consumerKey"];
+            string _consumerSecret = ConfigurationManager.AppSettings["consumerSecret"];
+            string _accessToken = ConfigurationManager.AppSettings["accessToken"];
+            string _accessTokenSecret = ConfigurationManager.AppSettings["accessTokenSecret"];
+
 
             var service = new TwitterService(_consumerKey, _consumerSecret);
             service.AuthenticateWith(_accessToken, _accessTokenSecret);
@@ -138,10 +146,10 @@ namespace TwitterBot_Csharp.Classes
         public static void FollowPoetryHashtaggers(int cnt)
         {
 
-            string _consumerKey = "licUTuwmj4J16pMy30UFQZofI";
-            string _consumerSecret = "LuLn34qrT7iczsga7RvtJnHf1jncDH4oJU70Btzj9LTz8rjA5E";
-            string _accessToken = "801871349434187776-mcvC35KftjhlR7doV6l6UQzrAWIFbdz";
-            string _accessTokenSecret = "AWClOy005tBXiyxnFUlLVAuDhu269YI5vyh5HSW1mUA2D";
+            string _consumerKey = ConfigurationManager.AppSettings["consumerKey"];
+            string _consumerSecret = ConfigurationManager.AppSettings["consumerSecret"];
+            string _accessToken = ConfigurationManager.AppSettings["accessToken"];
+            string _accessTokenSecret = ConfigurationManager.AppSettings["accessTokenSecret"];
 
             var service = new TwitterService(_consumerKey, _consumerSecret);
             service.AuthenticateWith(_accessToken, _accessTokenSecret);
