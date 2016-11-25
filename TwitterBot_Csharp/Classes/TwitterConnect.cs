@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
 using System.Drawing.Imaging;
 using TweetSharp;
 
@@ -22,14 +21,64 @@ namespace TwitterBot_Csharp.Classes
             return stream;
         }
 
-        public static HtmlAgilityPack.HtmlDocument LinkToHtmlDoc(string url)
+        public static HtmlAgilityPack.HtmlDocument LinkToHtmlDoc(string url, bool utf8 = false) // default to non-utf8 unless made explicit
         {
             WebClient client = new WebClient();
-            client.Encoding = Encoding.UTF8; // to deal w/ odd chars
+            if (utf8 == true)
+            {
+                client.Encoding = Encoding.UTF8;
+            }// to deal w/ odd chars
             string htmlString = client.DownloadString(url);
             var doc = new HtmlAgilityPack.HtmlDocument();
             doc.LoadHtml(htmlString);
             return doc;
+        }
+
+        public static Image PublicDomainPoetryRndmToImage()
+        {
+
+            //get random page
+            Random rnd = new Random();
+            int page = rnd.Next(1, 500);
+            string url = "http://www.public-domain-poetry.com/listpoetry.php?letter=All&page=" + page.ToString();
+
+            var doc = TwitterConnect.LinkToHtmlDoc(url);
+
+            HtmlNodeCollection poemLinks = doc.DocumentNode.SelectNodes("//a"); // get all links
+            List<string> strPoems = new List<string>();
+
+            foreach (var link in poemLinks)
+            {
+                var href = link.Attributes["href"].Value;
+                if (href.ToString().Contains("php") == false
+                    && href.ToString().Contains("http") == false
+                    && href.ToString().Substring(href.Length - 1) != @"/"
+                    && href.ToString().Any(char.IsDigit))
+                {
+                    strPoems.Add(href); // get just hrefs
+                }
+            }
+
+            //get random poem
+            int rndPoem = rnd.Next(1, strPoems.Count);
+            url = "http://www.public-domain-poetry.com/" + strPoems[rndPoem];
+            doc = TwitterConnect.LinkToHtmlDoc(url);
+
+            HtmlNode title = doc.DocumentNode.SelectSingleNode("//font[@class='t0']");
+            HtmlNode poem = doc.DocumentNode.SelectSingleNode("//font[@class='t3a']");
+
+            string justTitle = title.InnerText.Substring(0, title.InnerText.LastIndexOf(" by "));
+            string justAuthor = title.InnerText.Substring(title.InnerText.LastIndexOf(" by ")+1);
+
+            string htmlConcat = @"<div style=""text-indent: -1em; padding-left: 1em;""> <b>" +
+                            justTitle.Replace("Public Domain Poetry - ", "").ToUpper() + @"</b> " + 
+                            justAuthor.ToUpper() + @"<br><br>" + 
+                            poem.OuterHtml + @"</div>";
+
+            Image image = TheArtOfDev.HtmlRenderer.WinForms.HtmlRender.RenderToImage(htmlConcat);
+
+            return image;
+
         }
 
         public static Image PoetryFoundationRndmToImage()
@@ -40,12 +89,8 @@ namespace TwitterBot_Csharp.Classes
 
             string url = "https://www.poetryfoundation.org/poems-and-poets/poems/detail/" + poemInt.ToString(); //90621
 
-            WebClient client = new WebClient();
-            client.Encoding = Encoding.UTF8; // to deal w/ odd chars
-            string htmlString = client.DownloadString(url);
 
-            var doc = new HtmlAgilityPack.HtmlDocument();
-            doc.LoadHtml(htmlString);
+            var doc = LinkToHtmlDoc(url, true);
 
             HtmlNode poemDiv = doc.DocumentNode.SelectSingleNode("//div[@class='poem']");
             HtmlNode titleSpan = doc.DocumentNode.SelectSingleNode("//span[@class='hdg hdg_1']");
