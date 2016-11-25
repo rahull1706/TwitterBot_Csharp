@@ -8,6 +8,11 @@ using TwitterBot_Csharp.Classes;
 using HtmlAgilityPack;
 using CsQuery;
 using System.Net;
+//using HtmlRender.WinForms;
+using System.Drawing;
+using System.Windows.Forms;
+using TheArtOfDev.HtmlRenderer;
+using System.Drawing.Imaging;
 
 namespace TwitterBot_Csharp
 {
@@ -16,22 +21,38 @@ namespace TwitterBot_Csharp
         static void Main(string[] args)
         {
 
-            string url = "https://www.poetryfoundation.org/poems-and-poets/poems/detail/90621";
+            string url = "https://www.poetryfoundation.org/poems-and-poets/poems/detail/57789"; //90621
 
             WebClient client = new WebClient();
             string htmlString = client.DownloadString(url);
 
-            var doc = new HtmlDocument();
+            var doc = new HtmlAgilityPack.HtmlDocument();
             doc.LoadHtml(htmlString);
 
-            HtmlNode rateNode = doc.DocumentNode.SelectSingleNode("//div[@class='poem']");
-            Console.WriteLine(rateNode.InnerText);
+            HtmlNode poemDiv = doc.DocumentNode.SelectSingleNode("//div[@class='poem']");
+            HtmlNode titleSpan = doc.DocumentNode.SelectSingleNode("//span[@class='hdg hdg_1']");
+            HtmlNode authSpan = doc.DocumentNode.SelectSingleNode("//span[@class='hdg hdg_utility']");
 
-//            HtmlNode specificNode = doc.GetElementbyId("poem");
+            string htmlConcat =
+                "<em>" + titleSpan.OuterHtml.ToString() + @"</em>"
+                + authSpan.InnerText.ToString()
+                + poemDiv.OuterHtml.ToString();
+
+
+            Image image = TheArtOfDev.HtmlRenderer.WinForms.HtmlRender.RenderToImage(htmlConcat);
+
+            image.Save(@"C:\Users\kirkbozeman\Desktop\test.png");
+            System.IO.File.WriteAllText(@"C:\Users\kirkbozeman\Desktop\Poem.txt", htmlConcat);
+
+            //m_Bitmap.Save(@"C:\Users\kirkbozeman\Desktop\test.png", ImageFormat.Png);
+
+            //            Console.WriteLine(rateNode);
+
+            //            HtmlNode specificNode = doc.GetElementbyId("poem");
             //            HtmlNodeCollection nodesMatchingXPath = doc.DocumentNode.SelectNodes("x/path/nodes");
-//            Console.WriteLine(specificNode.InnerText);
+            //            Console.WriteLine(specificNode.InnerText);
             //            TwitterConnect.PostToBot("this post");         
-            Console.ReadKey();
+            //  Console.ReadKey();
         }
     }
 }
