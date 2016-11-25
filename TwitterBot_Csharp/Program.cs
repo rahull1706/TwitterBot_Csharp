@@ -24,6 +24,7 @@ namespace TwitterBot_Csharp
             string url = "https://www.poetryfoundation.org/poems-and-poets/poems/detail/57789"; //90621
 
             WebClient client = new WebClient();
+            client.Encoding = Encoding.UTF8;
             string htmlString = client.DownloadString(url);
 
             var doc = new HtmlAgilityPack.HtmlDocument();
@@ -34,7 +35,7 @@ namespace TwitterBot_Csharp
             HtmlNode authSpan = doc.DocumentNode.SelectSingleNode("//span[@class='hdg hdg_utility']");
 
             string htmlConcat =
-                "<em>" + titleSpan.OuterHtml.ToString() + @"</em>"
+                "<em>" + titleSpan.InnerText.ToString() + @"</em>"
                 + authSpan.InnerText.ToString()
                 + poemDiv.OuterHtml.ToString();
 
@@ -44,13 +45,6 @@ namespace TwitterBot_Csharp
             image.Save(@"C:\Users\kirkbozeman\Desktop\test.png");
             System.IO.File.WriteAllText(@"C:\Users\kirkbozeman\Desktop\Poem.txt", htmlConcat);
 
-            //m_Bitmap.Save(@"C:\Users\kirkbozeman\Desktop\test.png", ImageFormat.Png);
-
-            //            Console.WriteLine(rateNode);
-
-            //            HtmlNode specificNode = doc.GetElementbyId("poem");
-            //            HtmlNodeCollection nodesMatchingXPath = doc.DocumentNode.SelectNodes("x/path/nodes");
-            //            Console.WriteLine(specificNode.InnerText);
             //            TwitterConnect.PostToBot("this post");         
             //  Console.ReadKey();
         }
