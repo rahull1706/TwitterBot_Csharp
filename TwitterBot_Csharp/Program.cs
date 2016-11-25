@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TweetSharp;
+using TwitterBot_Csharp.Classes;
 
 namespace TwitterBot_Csharp
 {
@@ -26,15 +27,21 @@ namespace TwitterBot_Csharp
             service.AuthenticateWith(_accessToken, _accessTokenSecret);
 
 
-            service.SendTweet(new SendTweetOptions {Status = "Hello world. #helloworld"});
+//            service.SendTweet(new SendTweetOptions {Status = "Hello world. #helloworld"});
 
-            var tweets = service.Search(new SearchOptions { Q = "trump", Count = 25, Resulttype = TwitterSearchResultType.Recent, IncludeEntities = false});
+            var tweets = service.Search(new SearchOptions { Q = "trump", Count = 1, Resulttype = TwitterSearchResultType.Popular, IncludeEntities = false});
 
 //            var tweets = service.ListTweetsOnHomeTimeline(new ListTweetsOnHomeTimelineOptions());
             foreach (var tweet in tweets.Statuses)
             {
-                Console.WriteLine("{0} says '{1}'", tweet.User.ScreenName, tweet.Text);
+                Console.WriteLine("{0}; {1}; {2}", tweet.User.ScreenName, tweet.Text, tweet.Id.ToString());
+                service.SendTweet(new SendTweetOptions { InReplyToStatusId = tweet.Id, Status = "@" + tweet.User.ScreenName + " it's not your fault"});
+                //                service.Retweet(new RetweetOptions {Id = tweet.Id }); // this is how to retweet
             }
+
+
+//            service.SendTweet
+
             Console.ReadKey();
              
 
