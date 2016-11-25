@@ -21,10 +21,14 @@ namespace TwitterBot_Csharp
         static void Main(string[] args)
         {
 
-            string url = "https://www.poetryfoundation.org/poems-and-poets/poems/detail/57789"; //90621
+            Random rnd = new Random();
+            int poemInt = rnd.Next(50100, 58800);
+
+
+            string url = "https://www.poetryfoundation.org/poems-and-poets/poems/detail/" + poemInt.ToString(); //90621
 
             WebClient client = new WebClient();
-            client.Encoding = Encoding.UTF8;
+            client.Encoding = Encoding.UTF8; // to deal w/ odd chars
             string htmlString = client.DownloadString(url);
 
             var doc = new HtmlAgilityPack.HtmlDocument();
@@ -35,8 +39,9 @@ namespace TwitterBot_Csharp
             HtmlNode authSpan = doc.DocumentNode.SelectSingleNode("//span[@class='hdg hdg_utility']");
 
             string htmlConcat =
-                "<em>" + titleSpan.InnerText.ToString() + @"</em>"
-                + authSpan.InnerText.ToString()
+
+                 @"<div style=""text-indent: -1em; padding-left: 1em;""> <b>" + titleSpan.InnerText.ToString().ToUpper() + @"</b>"
+                + authSpan.InnerText.ToString().ToUpper() + @"</div><br>"
                 + poemDiv.OuterHtml.ToString();
 
 
@@ -45,7 +50,9 @@ namespace TwitterBot_Csharp
             image.Save(@"C:\Users\kirkbozeman\Desktop\test.png");
             System.IO.File.WriteAllText(@"C:\Users\kirkbozeman\Desktop\Poem.txt", htmlConcat);
 
-            //            TwitterConnect.PostToBot("this post");         
+
+            TwitterConnect.PostToBot("", image.ToStream(ImageFormat.Png));
+
             //  Console.ReadKey();
         }
     }

@@ -4,12 +4,30 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TweetSharp;
+using System.Drawing;
+using System.IO;
+using System.Drawing.Imaging;
 
 namespace TwitterBot_Csharp.Classes
 {
-    class TwitterConnect
+    public static class TwitterConnect
     {
-        public static void PostToBot(string post)
+        public static Stream ToStream(this Image image, ImageFormat format)
+        {
+            var stream = new System.IO.MemoryStream();
+            image.Save(stream, format);
+            stream.Position = 0;
+            return stream;
+        }
+
+        public static Image PoetryFoundationToImage()
+        {
+
+
+        }
+
+
+        public static void PostToBot(string post, Stream stream)
         {
             /* TweetSharp is no longer being updated but is necessary. TweetMoaSharp is the current
             updated package. Use Update-Package TweetMoaSharp to update it. Use Update-Package -reinstall TweetMoaSharp
@@ -23,9 +41,17 @@ namespace TwitterBot_Csharp.Classes
 
             var service = new TwitterService(_consumerKey, _consumerSecret);
             service.AuthenticateWith(_accessToken, _accessTokenSecret);
+            
+            service.SendTweetWithMedia(new SendTweetWithMediaOptions
+            {
+//                Status = post,
+                Images = new Dictionary<string, Stream> { { "john", stream } }
+            });
 
-            service.SendTweet(new SendTweetOptions { Status = post });
+//            service.SendTweet(new SendTweetOptions { Status = post });
 
         }
+
+
     }
 }
