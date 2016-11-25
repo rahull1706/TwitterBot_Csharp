@@ -139,7 +139,7 @@ namespace TwitterBot_Csharp.Classes
                 Images = new Dictionary<string, Stream> { { "john", stream } }
             });
 
-//            service.SendTweet(new SendTweetOptions { Status = post });
+//            service.SendTweet(new SendTweetOptions { Status = post }); 
 
         }
 
