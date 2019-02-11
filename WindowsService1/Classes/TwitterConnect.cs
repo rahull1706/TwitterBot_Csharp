@@ -10,9 +10,6 @@ using System.Net;
 using System.Text;
 using System.Drawing.Imaging;
 using TweetSharp;
-using System.Text.RegularExpressions;
-using System.Data.SqlClient;
-using System.Data;
 
 namespace TwitterBot_Csharp.Classes
 {
@@ -115,58 +112,17 @@ namespace TwitterBot_Csharp.Classes
         }
 
 
-        public static Image PoetsorgToImage()
-        {
-
-            //get random page
-            Random rnd = new Random();
-            int rndPage = rnd.Next(1, 698);
-            string url = "https://www.poets.org/poetsorg/poems?field_occasion_tid=All&field_poem_themes_tid=All&field_form_tid=All&page=" + rndPage.ToString();
-            var doc = LinkToHtmlDoc(url, true);
-
-            HtmlNodeCollection poemLinks = doc.DocumentNode.SelectNodes("//a"); // get all links
-            List<string> strPoems = new List<string>();
-            foreach (var link in poemLinks)
-            {
-
-                if (link.OuterHtml.Contains("href"))
-                {
-                    var href = link.Attributes["href"].Value;
-                    if (href.ToString().Contains(@"poetsorg/poem/"))
-                    {
-                        strPoems.Add(href); // get just hrefs
-                    }
-
-                }
-            }
-
-            //get random poem
-            int rndPoem = rnd.Next(1, strPoems.Count);
-            url = "https://www.poets.org" + strPoems[rndPoem]; // base link needed
-            doc = PoetryBot.LinkToHtmlDoc(url, true);
-
-            HtmlNode poemDiv = doc.DocumentNode.SelectSingleNode("//div[@id='poem-content'] //div[@class='field-item even']");
-            HtmlNode authSpan = doc.DocumentNode.SelectSingleNode("//div[@id='poem-content'] //span[@class='node-title']");
-            HtmlNode titleSpan = doc.DocumentNode.SelectSingleNode("//div[@id='poem-content'] //h1[@id='page-title']");
-            string htmlConcat =
-                @"<div style=""text-indent: -1em; padding-left: 1em;""> <b>" + titleSpan.InnerText.ToString().ToUpper() + @"</b>"
-            + " BY " + authSpan.InnerText.ToString().ToUpper() + @"<br>"
-            + poemDiv.OuterHtml.ToString() + @"</div>";
-                            
-            Image image = TheArtOfDev.HtmlRenderer.WinForms.HtmlRender.RenderToImage(htmlConcat);
-
-            //Image image = null;
-            return image;
-
-        }
-
-
         public static void PostToBot(string post, Stream stream)
         {
             /* TweetSharp is no longer being updated but is necessary. TweetMoaSharp is the current
             updated package. Use Update-Package TweetMoaSharp to update it. Use Update-Package -reinstall TweetMoaSharp
             to reinstall the entire package. It must be installed ON TOP of existing final TweetSharp package.
              */
+
+/*            string _consumerKey = "licUTuwmj4J16pMy30UFQZofI";
+            string _consumerSecret = "LuLn34qrT7iczsga7RvtJnHf1jncDH4oJU70Btzj9LTz8rjA5E";
+            string _accessToken = "801871349434187776-mcvC35KftjhlR7doV6l6UQzrAWIFbdz";
+            string _accessTokenSecret = "AWClOy005tBXiyxnFUlLVAuDhu269YI5vyh5HSW1mUA2D";*/
 
             string _consumerKey = ConfigurationManager.AppSettings["consumerKey"];
             string _consumerSecret = ConfigurationManager.AppSettings["consumerSecret"];
@@ -230,42 +186,6 @@ namespace TwitterBot_Csharp.Classes
             }
 
         }
-
-
-        public static void LogTweetInfo()
-        {
-//            SqlConnection conn = new SqlConnection("Data Source=KIRKBOZEMAN98C1\\SQLEXPRESS;Initial Catalog=Sandbox;Integrated Security=SSPI;");
-
-            var connectionString = ConfigurationManager.ConnectionStrings["LogConnect"].ConnectionString;
-            
-            string query = @"INSERT INTO dbo.PoetryBotLog(Link, RandomInt, PostDatetime) "
-                            + @"VALUES(@link, @randomint, @postdatetime)";
-
-            using (var conn = new SqlConnection(connectionString))
-            {
-                using (SqlCommand cmd = new SqlCommand(query, conn))
-                {
-
-                    cmd.Parameters.Add("@link", SqlDbType.VarChar);
-                    cmd.Parameters.Add("@randomint", SqlDbType.Int);
-                    cmd.Parameters.Add("@postdatetime", SqlDbType.VarChar);
-
-
-                    cmd.Parameters["@link"].Value = "http://link"; // can use array location or param name
-                    cmd.Parameters["@randomint"].Value = 3;
-                    cmd.Parameters["@postdatetime"].Value = DateTime.Now;
-
-                    conn.Open();
-                    cmd.ExecuteNonQuery();
-                    conn.Close();
-                }
-            }
-            
-
-
-
-        }
-
 
     }
 }

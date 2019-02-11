@@ -10,28 +10,33 @@ namespace TwitterBot_Csharp
         static void Main(string[] args)
         {
 
-            // create a config file for your creds so you can publish to GitHub
             // add epigraphs for poetry foundation
-                        
+
             try
             {
                 Random rnd = new Random();
-                int rndMethod = rnd.Next(1, 2);
-
-//                rndMethod = 3;
+                int rndMethod = rnd.Next(1, 4); // this is how you get 1-3 random
 
                 Image image;
 
                 if (rndMethod == 1)
                 {
-                    image = TwitterConnect.PoetryFoundationRndmToImage();
-                    TwitterConnect.PostToBot("", image.ToStream(ImageFormat.Png));
+                    image = PoetryBot.PoetryFoundationRndmToImage();
+                    PoetryBot.PostToBot("", image.ToStream(ImageFormat.Png));
                 }
                 if (rndMethod == 2)
                 {
-                    image = TwitterConnect.PublicDomainPoetryRndmToImage();
-                    TwitterConnect.PostToBot("", image.ToStream(ImageFormat.Png));
+                    image = PoetryBot.PublicDomainPoetryRndmToImage();
+                    PoetryBot.PostToBot("", image.ToStream(ImageFormat.Png));
                 }
+                if (rndMethod == 3)
+                {
+                    image = PoetryBot.PoetsorgToImage();
+                    PoetryBot.PostToBot("", image.ToStream(ImageFormat.Png));
+                }
+
+        //      PoetryBot.LogTweetInfo();
+
 
             }
             catch (Exception e)
@@ -40,8 +45,9 @@ namespace TwitterBot_Csharp
                 Console.ReadKey();
             }
 
-            TwitterConnect.FollowPoetryHashtaggers(1);
-
+            PoetryBot.FollowPoetryHashtaggers(1);
+            PoetryBot.FollowBackNotFollowed();
+            
         }
     }
 }
