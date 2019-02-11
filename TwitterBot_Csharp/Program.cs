@@ -19,17 +19,17 @@ namespace TwitterBot_Csharp
 
                 Image image;
 
-                if (rndMethod == 1)
+                if (rndMethod == 1) // poetry foundation
                 {
                     image = PoetryBot.PoetryFoundationRndmToImage();
                     PoetryBot.PostToBot("", image.ToStream(ImageFormat.Png));
                 }
-                if (rndMethod == 2)
+                if (rndMethod == 2) // public domain poetry
                 {
                     image = PoetryBot.PublicDomainPoetryRndmToImage();
                     PoetryBot.PostToBot("", image.ToStream(ImageFormat.Png));
                 }
-                if (rndMethod == 3)
+                if (rndMethod == 3) //poets.org
                 {
                     image = PoetryBot.PoetsorgToImage();
                     PoetryBot.PostToBot("", image.ToStream(ImageFormat.Png));
